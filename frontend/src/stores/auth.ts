@@ -32,7 +32,9 @@ export const useAuthStore = create<AuthState>((set) => ({
 
   login: async (username, password) => {
     const res = await api.post('/auth/login', { username, password })
+    localStorage.setItem('token', res.data.token)
     localStorage.setItem('username', username)
+    localStorage.setItem('forceChange', String(res.data.forceChange))
     set({
       token: res.data.token,
       username,

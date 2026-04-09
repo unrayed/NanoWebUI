@@ -133,7 +133,7 @@ def load_config(path: str | None = None) -> Config:
         cfg = Config()
         cfg.providers = _make_default_providers()
         return cfg
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         raw = json.load(f)
     try:
         return Config(**raw)
@@ -147,7 +147,7 @@ def save_config(config: Config, path: str | None = None):
     config_path = Path(path) if path else DEFAULT_CONFIG_PATH
     config_path.parent.mkdir(parents=True, exist_ok=True)
     dump = config.model_dump(by_alias=True, exclude_none=False)
-    with open(config_path, "w") as f:
+    with open(config_path, "w", encoding="utf-8") as f:
         json.dump(dump, f, indent=2)
 
 

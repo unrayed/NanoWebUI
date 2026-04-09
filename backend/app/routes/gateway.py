@@ -1,4 +1,5 @@
 from fastapi import APIRouter
+from fastapi.responses import JSONResponse
 from app.gateway import gateway_manager
 
 router = APIRouter(prefix="/api/gateway", tags=["gateway"])
@@ -13,8 +14,7 @@ def gateway_status():
 async def gateway_start():
     result = await gateway_manager.start()
     if result["status"] == "error":
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=result["message"])
+        return JSONResponse(status_code=500, content={"detail": result["message"]})
     return result
 
 
@@ -22,8 +22,7 @@ async def gateway_start():
 async def gateway_stop():
     result = await gateway_manager.stop()
     if result["status"] == "error":
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=result["message"])
+        return JSONResponse(status_code=500, content={"detail": result["message"]})
     return result
 
 
@@ -31,8 +30,7 @@ async def gateway_stop():
 async def gateway_restart():
     result = await gateway_manager.restart()
     if result["status"] == "error":
-        from fastapi import HTTPException
-        raise HTTPException(status_code=500, detail=result["message"])
+        return JSONResponse(status_code=500, content={"detail": result["message"]})
     return result
 
 

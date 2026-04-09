@@ -1,9 +1,7 @@
 import json
 import os
 from pathlib import Path
-from passlib.context import CryptContext
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+import bcrypt
 
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
@@ -22,11 +20,19 @@ def _save(data):
         json.dump(data, f, indent=2)
 
 
+def _hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
+
+def _verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode("utf-8"), hashed.encode("utf-8"))
+
+
 def init_default():
     if not _load():
         _save({
             "username": "admin",
-            "password_hash": pwd_context.hash("admin"),
+            "password_hash": _hash_password("admin"),
             "force_change": True,
         })
 
@@ -37,16 +43,16 @@ def verify_credentials(username, password):
         return False
     if data["username"] != username:
         return False
-    return pwd_context.verify(password, data["password_hash"])
+    return _verify_password(password, data["password_hash"])
 
 
 def change_password(current_password, new_password):
     data = _load()
     if not data:
         return False, "No auth data found"
-    if not pwd_context.verify(current_password, data["password_hash"]):
+    if not _verify_password(current_password, data["password_hash"]):
         return False, "Current password is incorrect"
-    data["password_hash"] = pwd_context.hash(new_password)
+    data["password_hash"] = _hash_password(new_password)
     data["force_change"] = False
     _save(data)
     return True, "Password changed successfully"
@@ -56,7 +62,7 @@ def change_username(current_password, new_username):
     data = _load()
     if not data:
         return False, "No auth data found"
-    if not pwd_context.verify(current_password, data["password_hash"]):
+    if not _verify_password(current_password, data["password_hash"]):
         return False, "Current password is incorrect"
     data["username"] = new_username
     _save(data)

@@ -1,9 +1,8 @@
 import os
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import JSONResponse, FileResponse
 from pathlib import Path
 from jose import jwt
 
@@ -12,7 +11,7 @@ from app.routes import auth, config, gateway, providers, logs
 
 JWT_SECRET = os.environ.get("NANOWEBUI_SECRET_KEY", "nanowebui-dev-secret-change-in-production")
 
-PUBLIC_PATHS = ["/api/auth/login", "/docs", "/openapi.json", "/redoc"]
+PUBLIC_PATHS = {"/api/auth/login", "/docs", "/openapi.json", "/redoc"}
 
 
 async def verify_auth(request: Request, call_next):
@@ -21,13 +20,13 @@ async def verify_auth(request: Request, call_next):
 
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Missing authorization header")
+        return JSONResponse(status_code=401, content={"detail": "Unauthorized"})
 
     token = auth_header.split(" ", 1)[1]
     try:
         jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
     except Exception:
-        raise HTTPException(status_code=401, detail="Invalid or expired token")
+        return JSONResponse(status_code=401, content={"detail": "Invalid or expired token"})
 
     return await call_next(request)
 
