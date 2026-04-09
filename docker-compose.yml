@@ -1,0 +1,12 @@
+services:
+  nanowebui:
+    build: .
+    container_name: nanowebui
+    ports:
+      - "3000:3000"
+    volumes:
+      - $HOME/.nanobot:/root/.nanobot
+    environment:
+      - NANOBOT_CONFIG_PATH=/root/.nanobot/config.json
+      - NANOWEBUI_SECRET_KEY=change-this-to-a-random-secret-key
+    restart: unless-stopped
