@@ -28,11 +28,14 @@ async def test_provider(name: str):
     if name not in PROVIDER_MAP:
         raise HTTPException(status_code=404, detail=f"Provider '{name}' not found")
 
+    provider_meta = PROVIDER_MAP[name]
+    test_model = provider_meta.get("testModel")
+
     config = load_config(get_config_path())
     providers_data = config.model_dump(by_alias=True).get("providers", {})
     provider_cfg = providers_data.get(name, {})
     api_key = provider_cfg.get("apiKey", "")
-    api_base = provider_cfg.get("apiBase") or PROVIDER_MAP[name].get("defaultApiBase")
+    api_base = provider_cfg.get("apiBase") or provider_meta.get("defaultApiBase")
 
     if not api_key:
         raise HTTPException(status_code=400, detail="No API key configured for this provider")
@@ -42,14 +45,24 @@ async def test_provider(name: str):
         raise HTTPException(status_code=400, detail="No API base URL configured")
 
     try:
-        if test_base.endswith("/v1"):
-            test_url = f"{test_base}/models"
+        if test_model:
+            test_url = f"{test_base}/chat/completions"
+            headers = {
+                "Authorization": f"Bearer {api_key}",
+                "Content-Type": "application/json",
+            }
+            body = {
+                "model": test_model,
+                "messages": [{"role": "user", "content": "Hi"}],
+                "max_tokens": 1,
+            }
+            async with httpx.AsyncClient(timeout=15) as client:
+                resp = await client.post(test_url, headers=headers, json=body)
         else:
             test_url = f"{test_base}/models"
-
-        headers = {"Authorization": f"Bearer {api_key}"}
-        async with httpx.AsyncClient(timeout=10) as client:
-            resp = await client.get(test_url, headers=headers)
+            headers = {"Authorization": f"Bearer {api_key}"}
+            async with httpx.AsyncClient(timeout=10) as client:
+                resp = await client.get(test_url, headers=headers)
 
         if resp.status_code == 200:
             return {"success": True, "message": "Connection successful"}
@@ -57,6 +70,10 @@ async def test_provider(name: str):
             return {"success": False, "message": "Invalid API key"}
         elif resp.status_code == 403:
             return {"success": False, "message": "Access forbidden. Check API key permissions."}
+        elif resp.status_code == 404:
+            return {"success": False, "message": f"Model '{test_model}' not found. Try a different model."}
+        elif resp.status_code == 429:
+            return {"success": False, "message": "Rate limited. Try again later."}
         else:
             return {"success": False, "message": f"HTTP {resp.status_code}: {resp.text[:200]}"}
     except httpx.ConnectError:

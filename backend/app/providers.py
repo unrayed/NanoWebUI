@@ -8,6 +8,7 @@ PROVIDERS = [
         "isGateway": True,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": "sk-or-",
+        "testModel": "google/gemma-3-1b-it:free",
     },
     {
         "name": "anthropic",
@@ -18,6 +19,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": "sk-ant-",
+        "testModel": "claude-sonnet-4-20250514",
     },
     {
         "name": "openai",
@@ -28,6 +30,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": "sk-",
+        "testModel": "gpt-4o-mini",
     },
     {
         "name": "deepseek",
@@ -38,6 +41,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": "sk-",
+        "testModel": "deepseek-chat",
     },
     {
         "name": "groq",
@@ -48,6 +52,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": "gsk_",
+        "testModel": "llama-3.1-8b-instant",
     },
     {
         "name": "gemini",
@@ -58,6 +63,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": "AIza",
+        "testModel": "gemini-2.0-flash",
     },
     {
         "name": "siliconflow",
@@ -68,6 +74,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": "sk-",
+        "testModel": "Qwen/Qwen2.5-7B-Instruct",
     },
     {
         "name": "aihubmix",
@@ -78,6 +85,7 @@ PROVIDERS = [
         "isGateway": True,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": "sk-",
+        "testModel": "gpt-4o-mini",
     },
     {
         "name": "volcengine",
@@ -88,6 +96,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "doubao-lite-4k",
     },
     {
         "name": "byteplus",
@@ -98,6 +107,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "ByteDance-Seed",
     },
     {
         "name": "zhipu",
@@ -108,6 +118,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "glm-4-flash",
     },
     {
         "name": "dashscope",
@@ -118,6 +129,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": "sk-",
+        "testModel": "qwen-turbo",
     },
     {
         "name": "moonshot",
@@ -128,6 +140,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": "sk-",
+        "testModel": "moonshot-v1-8k",
     },
     {
         "name": "minimax",
@@ -138,6 +151,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "MiniMax-M1",
     },
     {
         "name": "mistral",
@@ -148,6 +162,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "mistral-small-latest",
     },
     {
         "name": "stepfun",
@@ -158,6 +173,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "step-1-8k",
     },
     {
         "name": "xiaomiMimo",
@@ -168,6 +184,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "mimo-v2",
     },
     {
         "name": "qianfan",
@@ -178,6 +195,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "ERNIE-Speed-8K",
     },
     {
         "name": "ollama",
@@ -188,6 +206,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": "llama3.2",
     },
     {
         "name": "vllm",
@@ -198,6 +217,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": None,
+        "testModel": None,
     },
     {
         "name": "ovms",
@@ -208,6 +228,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": None,
     },
     {
         "name": "azureOpenai",
@@ -218,6 +239,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": True,
         "detectByKeyPrefix": None,
+        "testModel": None,
     },
     {
         "name": "custom",
@@ -228,6 +250,7 @@ PROVIDERS = [
         "isGateway": False,
         "supportsPromptCaching": False,
         "detectByKeyPrefix": None,
+        "testModel": None,
     },
 ]
 

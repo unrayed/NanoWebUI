@@ -6,28 +6,72 @@ import Button from '../components/Button'
 import Input from '../components/Input'
 import { KeyRound, CheckCircle, XCircle, Loader2, Zap } from 'lucide-react'
 
+interface ProviderEdit {
+  name: string
+  displayName: string
+  envKey: string
+  defaultApiBase: string | null
+  backend: string
+  isGateway: boolean
+  supportsPromptCaching: boolean
+  detectByKeyPrefix: string | null
+  configured: boolean
+  apiKey: string
+  apiBase: string | null
+}
+
 export default function ProvidersPage() {
-  const providers = useProvidersStore((s) => s.providers)
+  const providersMeta = useProvidersStore((s) => s.providers)
   const loading = useProvidersStore((s) => s.loading)
   const fetchProviders = useProvidersStore((s) => s.fetchProviders)
   const testProvider = useProvidersStore((s) => s.testProvider)
   const config = useConfigStore((s) => s.config)
   const saveConfig = useConfigStore((s) => s.saveConfig)
-  const updateField = useConfigStore((s) => s.updateField)
+  const fetchConfig = useConfigStore((s) => s.fetchConfig)
+
+  const [providers, setProviders] = useState<ProviderEdit[]>([])
   const [testing, setTesting] = useState<string | null>(null)
   const [testResults, setTestResults] = useState<Record<string, { success: boolean; message: string }>>({})
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
 
   useEffect(() => {
+    fetchConfig()
     fetchProviders()
-  }, [fetchProviders])
+  }, [fetchConfig, fetchProviders])
+
+  useEffect(() => {
+    if (providersMeta.length > 0) {
+      setProviders(providersMeta)
+    }
+  }, [providersMeta])
+
+  const updateProvider = (name: string, field: string, value: any) => {
+    setProviders((prev) =>
+      prev.map((p) => (p.name === name ? { ...p, [field]: value } : p))
+    )
+    setTestResults((prev) => {
+      const next = { ...prev }
+      delete next[name]
+      return next
+    })
+  }
 
   const handleSave = async () => {
+    if (!config) return
     setSaving(true)
     setMessage(null)
     try {
-      await saveConfig(config!)
+      const updated = { ...config }
+      updated.providers = {}
+      for (const p of providers) {
+        updated.providers[p.name] = {
+          apiKey: p.apiKey,
+          apiBase: p.apiBase || null,
+          extraHeaders: null,
+        }
+      }
+      await saveConfig(updated)
       setMessage({ type: 'success', text: 'Config saved successfully' })
       await fetchProviders()
     } catch (err: any) {
@@ -40,6 +84,14 @@ export default function ProvidersPage() {
   const handleTest = async (name: string) => {
     setTesting(name)
     try {
+      const provider = providers.find((p) => p.name === name)
+      if (!provider?.apiKey) {
+        setTestResults((prev) => ({
+          ...prev,
+          [name]: { success: false, message: 'Enter an API key first' },
+        }))
+        return
+      }
       const result = await testProvider(name)
       setTestResults((prev) => ({ ...prev, [name]: result }))
     } finally {
@@ -83,7 +135,7 @@ export default function ProvidersPage() {
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <KeyRound className={`w-4 h-4 ${provider.configured ? 'text-green-600' : 'text-gray-400'}`} />
+                    <KeyRound className={`w-4 h-4 ${provider.apiKey ? 'text-green-600' : 'text-gray-400'}`} />
                     <CardTitle>{provider.displayName}</CardTitle>
                   </div>
                   <div className="flex items-center gap-2">
@@ -106,20 +158,13 @@ export default function ProvidersPage() {
                   label="API Key"
                   type="password"
                   value={provider.apiKey || ''}
-                  onChange={(e) => {
-                    updateField(['providers', provider.name, 'apiKey'], e.target.value)
-                    setTestResults((prev) => {
-                      const next = { ...prev }
-                      delete next[provider.name]
-                      return next
-                    })
-                  }}
+                  onChange={(e) => updateProvider(provider.name, 'apiKey', e.target.value)}
                   placeholder={provider.envKey ? `$${provider.envKey}` : 'Enter API key'}
                 />
                 <Input
                   label="API Base URL"
                   value={provider.apiBase || ''}
-                  onChange={(e) => updateField(['providers', provider.name, 'apiBase'], e.target.value || null)}
+                  onChange={(e) => updateProvider(provider.name, 'apiBase', e.target.value || null)}
                   placeholder={provider.defaultApiBase || 'Default'}
                 />
 
